@@ -1,0 +1,18 @@
+[
+  {
+    "id": 1,
+    "firstname": "Wilmer",
+    "lastname": "Patiño",
+    "username": "w.patino",
+    "password": "291029b6735be7096a8346cb8d9fa80b:59127333e1489021952ab01b1ba101605261c7863fdd949f6a45a0c724df760c",
+    "avatar": "/img/users/avatar-1710000000.png"
+  },
+  {
+    "id": 2,
+    "firstname": "Jean Carlos",
+    "lastname": "Celis",
+    "username": "je.celis",
+    "password": "41c24ceab146a75155827342a37b4996:5d8d81750337cdfb1bdb9e08a2e23fae6603f5c0451d78a7984848048aa62c26",
+    "avatar": "/img/users/avatar-1793043911561-pet-avatar-cat.webp"
+  }
+]

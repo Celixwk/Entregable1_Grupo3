@@ -1,0 +1,1498 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FaunaHub &bull; Panel de Gestión</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090d16;
+      --surface: #111827;
+      --surface-elevated: #1a2234;
+      --surface-hover: #222d42;
+      --border: #242f44;
+      --border-subtle: #1c2536;
+      
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --primary-light: rgba(79, 70, 229, 0.12);
+      
+      --accent-emerald: #10b981;
+      --accent-emerald-subtle: rgba(16, 185, 129, 0.12);
+      --accent-amber: #f59e0b;
+      --accent-amber-subtle: rgba(245, 158, 11, 0.12);
+      --danger: #ef4444;
+      --danger-subtle: rgba(239, 68, 68, 0.12);
+      
+      --text: #f3f4f6;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.4);
+      --shadow-md: 0 4px 14px rgba(0,0,0,0.3);
+      --shadow-lg: 0 12px 32px rgba(0,0,0,0.5);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Top Navigation */
+    .topbar {
+      height: 64px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .brand-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius-sm);
+      background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+
+    .brand-title {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .brand-badge {
+      font-size: 0.68rem;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 9999px;
+      background: var(--primary-light);
+      color: #818cf8;
+      border: 1px solid rgba(129, 140, 248, 0.2);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .nav-switcher {
+      display: flex;
+      background: var(--bg);
+      padding: 3px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 0.45rem 1rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.15s ease;
+    }
+
+    .nav-btn:hover {
+      color: var(--text);
+    }
+
+    .nav-btn.active {
+      background: var(--surface-elevated);
+      color: white;
+      box-shadow: var(--shadow-sm);
+      font-weight: 600;
+    }
+
+    /* Subheader Stats */
+    .dashboard-header {
+      padding: 2rem 2rem 1.5rem;
+      max-width: 1320px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+
+    .dashboard-title h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.35rem;
+    }
+
+    .dashboard-title p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+
+    .stats-row {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .stat-chip {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .stat-chip .stat-value {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: white;
+    }
+
+    .stat-chip .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    /* Main Container */
+    main {
+      max-width: 1320px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 0 2rem 3rem;
+      flex: 1;
+    }
+
+    /* Action bar */
+    .action-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .search-wrapper {
+      position: relative;
+      flex: 1;
+      max-width: 360px;
+    }
+
+    .search-wrapper svg {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dim);
+      width: 16px;
+      height: 16px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 0.6rem 0.85rem 0.6rem 2.3rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-size: 0.88rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .search-input:focus {
+      border-color: var(--primary);
+    }
+
+    .filter-pills {
+      display: flex;
+      gap: 0.4rem;
+      overflow-x: auto;
+      max-width: 100%;
+      padding-bottom: 4px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+
+    .filter-pill {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 0.4rem 0.85rem;
+      border-radius: 9999px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+
+    .filter-pill:hover {
+      border-color: var(--text-muted);
+      color: var(--text);
+    }
+
+    .filter-pill.active {
+      background: white;
+      color: #0f172a;
+      border-color: white;
+      font-weight: 600;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1.1rem;
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-secondary {
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .btn-secondary:hover {
+      background: var(--surface-hover);
+    }
+
+    .btn-danger-ghost {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      padding: 0.4rem 0.6rem;
+      border-radius: var(--radius-sm);
+    }
+
+    .btn-danger-ghost:hover {
+      background: var(--danger-subtle);
+      color: #fca5a5;
+      border-color: rgba(239, 68, 68, 0.2);
+    }
+
+    /* Cards Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 1.25rem;
+    }
+
+    /* Pet Card */
+    .pet-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .pet-card:hover {
+      transform: translateY(-2px);
+      border-color: #3b4660;
+      box-shadow: var(--shadow-md);
+    }
+
+    .pet-media-container {
+      position: relative;
+      background: #060910;
+      height: 190px;
+      overflow: hidden;
+    }
+
+    .pet-main-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+
+    .pet-main-image:hover {
+      transform: scale(1.03);
+    }
+
+    .pet-image-counter {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(4px);
+      padding: 2px 7px;
+      border-radius: var(--radius-sm);
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .pet-thumbnails {
+      display: flex;
+      gap: 4px;
+      padding: 6px 12px;
+      background: rgba(10, 14, 23, 0.6);
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+    }
+
+    .pet-thumb {
+      width: 36px;
+      height: 36px;
+      border-radius: 4px;
+      object-fit: cover;
+      cursor: pointer;
+      opacity: 0.6;
+      border: 1px solid transparent;
+      transition: all 0.15s;
+    }
+
+    .pet-thumb:hover, .pet-thumb.active {
+      opacity: 1;
+      border-color: var(--primary);
+    }
+
+    .pet-card-body {
+      padding: 1.1rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      gap: 0.65rem;
+    }
+
+    .pet-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .pet-species {
+      font-size: 1.05rem;
+      font-weight: 700;
+      text-transform: capitalize;
+      color: white;
+    }
+
+    .pet-id {
+      font-size: 0.72rem;
+      font-family: ui-monospace, monospace;
+      color: var(--text-dim);
+      background: var(--bg);
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .pet-tags {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      font-size: 0.73rem;
+      font-weight: 500;
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+    }
+
+    .badge-sex-macho {
+      background: rgba(59, 130, 246, 0.12);
+      color: #93c5fd;
+      border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .badge-sex-hembra {
+      background: rgba(236, 72, 153, 0.12);
+      color: #f472b6;
+      border: 1px solid rgba(236, 72, 153, 0.2);
+    }
+
+    .badge-age {
+      background: var(--surface-elevated);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+    }
+
+    .pet-detail {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    .pet-card-footer {
+      margin-top: auto;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* User Card */
+    .user-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .user-card:hover {
+      transform: translateY(-2px);
+      border-color: #3b4660;
+      box-shadow: var(--shadow-md);
+    }
+
+    .user-card-header {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .user-avatar-wrap {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: var(--surface-elevated);
+      border: 2px solid var(--border);
+    }
+
+    .user-avatar-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .user-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .user-fullname {
+      font-size: 0.98rem;
+      font-weight: 600;
+      color: white;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-handle {
+      font-size: 0.82rem;
+      color: #818cf8;
+      font-family: ui-monospace, monospace;
+    }
+
+    .user-meta-details {
+      background: var(--bg);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      padding: 0.7rem;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .user-meta-details span {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .code-pill {
+      font-family: ui-monospace, monospace;
+      color: var(--text);
+    }
+
+    .user-card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: auto;
+    }
+
+    /* Empty state */
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 4rem 1rem;
+      color: var(--text-dim);
+    }
+
+    .empty-state svg {
+      width: 44px;
+      height: 44px;
+      margin-bottom: 1rem;
+      stroke-width: 1.5;
+    }
+
+    .empty-state h3 {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      margin-bottom: 0.35rem;
+    }
+
+    /* Modal Sheet */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 7, 13, 0.75);
+      backdrop-filter: blur(6px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 500px;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      transform: scale(0.96) translateY(8px);
+      transition: transform 0.2s ease;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-overlay.open .modal {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: white;
+    }
+
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 4px;
+      display: flex;
+      border-radius: 4px;
+    }
+
+    .modal-close:hover {
+      color: white;
+      background: var(--surface-hover);
+    }
+
+    .modal-body {
+      padding: 1.5rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .form-group label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.01em;
+    }
+
+    .form-control {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.9rem;
+      padding: 0.65rem 0.85rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    .form-control:focus {
+      border-color: var(--primary);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    /* Dropzone */
+    .dropzone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.25rem;
+      text-align: center;
+      cursor: pointer;
+      background: rgba(9, 13, 22, 0.4);
+      transition: border-color 0.15s, background-color 0.15s;
+      position: relative;
+    }
+
+    .dropzone:hover {
+      border-color: #3b4660;
+      background: var(--surface-elevated);
+    }
+
+    .dropzone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .dropzone-label {
+      font-size: 0.83rem;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .dropzone-previews {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-top: 0.75rem;
+    }
+
+    .preview-thumb {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-sm);
+      object-fit: cover;
+      border: 1px solid var(--border);
+    }
+
+    .modal-footer {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+    }
+
+    /* Lightbox */
+    .lightbox-modal {
+      max-width: 800px;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+    }
+
+    .lightbox-modal img {
+      max-width: 100%;
+      max-height: 80vh;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      object-fit: contain;
+      margin: 0 auto;
+      display: block;
+    }
+
+    /* Toast Notification */
+    .toast-container {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      z-index: 120;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .toast {
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.75rem 1.1rem;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      font-size: 0.86rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      animation: slideIn 0.2s ease forwards;
+    }
+
+    .toast-success {
+      border-left: 3px solid var(--accent-emerald);
+    }
+
+    .toast-error {
+      border-left: 3px solid var(--danger);
+    }
+
+    @keyframes slideIn {
+      from { transform: translateY(12px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="topbar">
+    <a href="#" class="brand">
+      <div class="brand-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="4" r="2"></circle>
+          <circle cx="18" cy="8" r="2"></circle>
+          <circle cx="20" cy="16" r="2"></circle>
+          <path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z"></path>
+        </svg>
+      </div>
+      <span class="brand-title">FaunaHub</span>
+      <span class="brand-badge">Admin</span>
+    </a>
+
+    <!-- Resource Tabs: Only Mascotas & Usuarios -->
+    <div class="nav-switcher">
+      <button class="nav-btn active" id="tab-pets-btn" onclick="switchResource('pets')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+          <line x1="9" y1="9" x2="9.01" y2="9"></line>
+          <line x1="15" y1="9" x2="15.01" y2="9"></line>
+        </svg>
+        Mascotas
+      </button>
+      <button class="nav-btn" id="tab-users-btn" onclick="switchResource('users')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        Usuarios
+      </button>
+    </div>
+  </header>
+
+  <!-- Dashboard Overview Header -->
+  <div class="dashboard-header">
+    <div class="dashboard-title">
+      <h2 id="view-title">Gestión de Mascotas</h2>
+      <p id="view-description">Catálogo de registros persistidos y archivos multimedia en el servidor.</p>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-chip">
+        <div>
+          <div class="stat-value" id="stat-pets-count">0</div>
+          <div class="stat-label">Mascotas</div>
+        </div>
+      </div>
+      <div class="stat-chip">
+        <div>
+          <div class="stat-value" id="stat-users-count">0</div>
+          <div class="stat-label">Usuarios</div>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="btn-open-create-modal" onclick="openCreateModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+        <span id="btn-create-label">Nueva Mascota</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Content Container -->
+  <main>
+    <!-- Filter and Search Bar -->
+    <div class="action-bar">
+      <div class="search-wrapper">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="filter-search" class="search-input" placeholder="Buscar por especie, color, nombre..." oninput="handleSearch(this.value)">
+      </div>
+
+      <div class="filter-pills" id="species-filter-container">
+        <button class="filter-pill active" onclick="setSpeciesFilter('all')">Todos</button>
+      </div>
+    </div>
+
+    <!-- Cards Dynamic Grid -->
+    <div class="grid" id="items-grid">
+      <!-- Generated via JS -->
+    </div>
+  </main>
+
+  <!-- Modal: Registrar Mascota -->
+  <div class="modal-overlay" id="modal-pet">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Registrar Nueva Mascota</h3>
+        <button class="modal-close" onclick="closeModal('modal-pet')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <form id="form-pet" onsubmit="submitPetForm(event)">
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Especie</label>
+              <input type="text" id="pet-species" class="form-control" placeholder="Especie (ej: perro, gato, conejo...)" required>
+            </div>
+            <div class="form-group">
+              <label>Sexo</label>
+              <select id="pet-sex" class="form-control" required>
+                <option value="macho">Macho</option>
+                <option value="hembra">Hembra</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Color</label>
+              <input type="text" id="pet-color" class="form-control" placeholder="Color o descripción" required>
+            </div>
+            <div class="form-group">
+              <label>Edad (años)</label>
+              <input type="number" id="pet-age" class="form-control" min="0" step="1" placeholder="Edad" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Fotografías (Hasta 5 imágenes)</label>
+            <div class="dropzone">
+              <input type="file" id="pet-images-input" accept="image/*" multiple onchange="handlePetFilePreview(this)">
+              <div class="dropzone-label">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                <span>Arrastra imágenes o haz clic aquí</span>
+                <span style="font-size: 0.72rem; color: var(--text-dim);">Formatos: jpg, png, webp (máx 5MB c/u)</span>
+              </div>
+              <div class="dropzone-previews" id="pet-previews-container"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modal-pet')">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="pet-submit-btn">Guardar Mascota</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Registrar Usuario -->
+  <div class="modal-overlay" id="modal-user">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Registrar Nuevo Usuario</h3>
+        <button class="modal-close" onclick="closeModal('modal-user')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+      <form id="form-user" onsubmit="submitUserForm(event)">
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Nombre</label>
+              <input type="text" id="user-fname" class="form-control" placeholder="Nombre" required>
+            </div>
+            <div class="form-group">
+              <label>Apellido</label>
+              <input type="text" id="user-lname" class="form-control" placeholder="Apellido" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Nombre de Usuario (username)</label>
+            <input type="text" id="user-uname" class="form-control" placeholder="Nombre de usuario" required>
+          </div>
+
+          <div class="form-group">
+            <label>Contraseña</label>
+            <input type="password" id="user-pass" class="form-control" placeholder="Contraseña" required>
+          </div>
+
+          <div class="form-group">
+            <label>Avatar de Perfil</label>
+            <div class="dropzone">
+              <input type="file" id="user-avatar-input" accept="image/*" onchange="handleUserAvatarPreview(this)">
+              <div class="dropzone-label">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                <span id="user-avatar-label">Seleccionar imagen de perfil</span>
+              </div>
+              <div class="dropzone-previews" id="user-avatar-preview"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modal-user')">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="user-submit-btn">Registrar Usuario</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Lightbox Modal for Pet Image Viewing -->
+  <div class="modal-overlay" id="modal-lightbox" onclick="closeModal('modal-lightbox')">
+    <div class="modal lightbox-modal">
+      <img id="lightbox-img" src="" alt="Vista previa">
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toasts"></div>
+
+  <script>
+    // App State
+    let currentResource = 'pets';
+    let petsData = [];
+    let usersData = [];
+    let speciesFilter = 'all';
+    let searchQuery = '';
+
+    // Switch between Pets & Users views
+    function switchResource(resource) {
+      currentResource = resource;
+      
+      document.getElementById('tab-pets-btn').classList.toggle('active', resource === 'pets');
+      document.getElementById('tab-users-btn').classList.toggle('active', resource === 'users');
+
+      const titleEl = document.getElementById('view-title');
+      const descEl = document.getElementById('view-description');
+      const createLabel = document.getElementById('btn-create-label');
+      const speciesFilterContainer = document.getElementById('species-filter-container');
+
+      if (resource === 'pets') {
+        titleEl.innerText = 'Gestión de Mascotas';
+        descEl.innerText = 'Catálogo de registros persistidos y archivos multimedia en el servidor.';
+        createLabel.innerText = 'Nueva Mascota';
+        speciesFilterContainer.style.display = 'flex';
+      } else {
+        titleEl.innerText = 'Directorio de Usuarios';
+        descEl.innerText = 'Cuentas de usuario con contraseñas protegidas mediante crypto.';
+        createLabel.innerText = 'Nuevo Usuario';
+        speciesFilterContainer.style.display = 'none';
+      }
+
+      renderItems();
+    }
+
+    // Load initial data
+    async function loadAllData() {
+      try {
+        const [petsRes, usersRes] = await Promise.all([
+          fetch('/api/pets'),
+          fetch('/api/users')
+        ]);
+        
+        const petsJson = await petsRes.json();
+        const usersJson = await usersRes.json();
+
+        petsData = petsJson.data || [];
+        usersData = usersJson.data || [];
+
+        document.getElementById('stat-pets-count').innerText = petsData.length;
+        document.getElementById('stat-users-count').innerText = usersData.length;
+
+        renderSpeciesFilters();
+        renderItems();
+      } catch (err) {
+        showToast('Error conectando con el servidor', true);
+      }
+    }
+
+    // Render dynamic species filters based on registered pets
+    function renderSpeciesFilters() {
+      const container = document.getElementById('species-filter-container');
+      if (!container) return;
+
+      const speciesSet = new Set();
+      petsData.forEach(p => {
+        if (p.especie && p.especie.trim()) {
+          speciesSet.add(p.especie.trim().toLowerCase());
+        }
+      });
+
+      const uniqueSpecies = Array.from(speciesSet).sort();
+
+      // If active filter is no longer in data, reset to 'all'
+      if (speciesFilter !== 'all' && !speciesSet.has(speciesFilter.toLowerCase())) {
+        speciesFilter = 'all';
+      }
+
+      let html = `<button class="filter-pill ${speciesFilter === 'all' ? 'active' : ''}" onclick="setSpeciesFilter('all')">Todos</button>`;
+
+      uniqueSpecies.forEach(sp => {
+        const capitalized = sp.charAt(0).toUpperCase() + sp.slice(1);
+        const isActive = speciesFilter.toLowerCase() === sp.toLowerCase();
+        html += `<button class="filter-pill ${isActive ? 'active' : ''}" onclick="setSpeciesFilter('${sp}')">${capitalized}</button>`;
+      });
+
+      container.innerHTML = html;
+    }
+
+    // Filter by Species
+    function setSpeciesFilter(species) {
+      speciesFilter = species;
+      renderSpeciesFilters();
+      renderItems();
+    }
+
+    // Search query filter
+    function handleSearch(val) {
+      searchQuery = val.trim().toLowerCase();
+      renderItems();
+    }
+
+    // Render cards
+    function renderItems() {
+      const container = document.getElementById('items-grid');
+      container.innerHTML = '';
+
+      if (currentResource === 'pets') {
+        let filtered = petsData;
+        if (speciesFilter !== 'all') {
+          filtered = filtered.filter(p => (p.especie || '').toLowerCase().trim() === speciesFilter.toLowerCase().trim());
+        }
+        if (searchQuery) {
+          filtered = filtered.filter(p => 
+            (p.especie || '').toLowerCase().includes(searchQuery) ||
+            (p.color || '').toLowerCase().includes(searchQuery) ||
+            (p.sexo || '').toLowerCase().includes(searchQuery)
+          );
+        }
+
+        if (filtered.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+              <h3>No se encontraron mascotas</h3>
+              <p>No hay registros que coincidan con los filtros aplicados.</p>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = filtered.map(pet => {
+          const images = pet.img && pet.img.length > 0 ? pet.img : ['/img/pets/default.jpg'];
+          const mainImg = images[0];
+          const hasMultiple = images.length > 1;
+
+          return `
+            <article class="pet-card" id="pet-card-${pet.id}">
+              <div class="pet-media-container">
+                <img src="${mainImg}" class="pet-main-image" id="main-img-${pet.id}" alt="${pet.especie}" onclick="openLightbox('${mainImg}')" onerror="this.src='/img/users/default-avatar.png'">
+                ${hasMultiple ? `
+                  <div class="pet-image-counter">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                    ${images.length}
+                  </div>
+                ` : ''}
+              </div>
+
+              ${hasMultiple ? `
+                <div class="pet-thumbnails">
+                  ${images.map((src, i) => `
+                    <img src="${src}" class="pet-thumb ${i === 0 ? 'active' : ''}" onclick="changePetThumb(${pet.id}, '${src}', this)" alt="Foto miniatura">
+                  `).join('')}
+                </div>
+              ` : ''}
+
+              <div class="pet-card-body">
+                <div class="pet-header">
+                  <h3 class="pet-species">${pet.especie}</h3>
+                  <span class="pet-id">#${pet.id}</span>
+                </div>
+
+                <div class="pet-tags">
+                  <span class="badge ${pet.sexo === 'macho' ? 'badge-sex-macho' : 'badge-sex-hembra'}">
+                    ${pet.sexo}
+                  </span>
+                  <span class="badge badge-age">${pet.edad} ${pet.edad === 1 ? 'año' : 'años'}</span>
+                </div>
+
+                <p class="pet-detail"><strong>Color:</strong> ${pet.color}</p>
+
+                <div class="pet-card-footer">
+                  <span style="font-size:0.75rem; color:var(--text-dim);">${images.length} ${images.length === 1 ? 'imagen' : 'imágenes'}</span>
+                  <button class="btn-danger-ghost" title="Eliminar mascota" onclick="deletePet(${pet.id})">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </article>
+          `;
+        }).join('');
+
+      } else {
+        // Users View
+        let filtered = usersData;
+        if (searchQuery) {
+          filtered = filtered.filter(u => 
+            (u.firstname || '').toLowerCase().includes(searchQuery) ||
+            (u.lastname || '').toLowerCase().includes(searchQuery) ||
+            (u.username || '').toLowerCase().includes(searchQuery)
+          );
+        }
+
+        if (filtered.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"></circle><line x1="8" y1="12" x2="16" y2="12"></line></svg>
+              <h3>No se encontraron usuarios</h3>
+              <p>No hay cuentas que coincidan con la búsqueda.</p>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = filtered.map(user => `
+          <article class="user-card">
+            <div class="user-card-header">
+              <div class="user-avatar-wrap">
+                <img src="${user.avatar}" alt="${user.firstname}" onerror="this.src='/img/users/default-avatar.png'">
+              </div>
+              <div class="user-info">
+                <div class="user-fullname">${user.firstname} ${user.lastname}</div>
+                <div class="user-handle">@${user.username}</div>
+              </div>
+            </div>
+
+            <div class="user-meta-details">
+              <span><span>ID de Registro:</span> <strong class="code-pill">#${user.id}</strong></span>
+              <span><span>Archivo Avatar:</span> <strong class="code-pill">${user.avatar ? user.avatar.split('/').pop() : 'default'}</strong></span>
+              <span><span>Seguridad:</span> <span style="color:var(--accent-emerald);">Cifrado Crypto</span></span>
+            </div>
+
+            <div class="user-card-footer">
+              <span style="font-size:0.75rem; color:var(--text-dim);">Registrado en users.json</span>
+              <button class="btn-danger-ghost" title="Eliminar usuario" onclick="deleteUser(${user.id})">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+              </button>
+            </div>
+          </article>
+        `).join('');
+      }
+    }
+
+    // Thumbnail click switcher
+    function changePetThumb(petId, src, thumbEl) {
+      const main = document.getElementById(`main-img-${petId}`);
+      if (main) main.src = src;
+      const card = document.getElementById(`pet-card-${petId}`);
+      if (card) {
+        card.querySelectorAll('.pet-thumb').forEach(t => t.classList.remove('active'));
+        thumbEl.classList.add('active');
+      }
+    }
+
+    // Lightbox
+    function openLightbox(src) {
+      document.getElementById('lightbox-img').src = src;
+      openModal('modal-lightbox');
+    }
+
+    // Modals
+    function openCreateModal() {
+      if (currentResource === 'pets') {
+        openModal('modal-pet');
+      } else {
+        openModal('modal-user');
+      }
+    }
+
+    function openModal(id) {
+      document.getElementById(id).classList.add('open');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('open');
+    }
+
+    // Pet file previews
+    function handlePetFilePreview(input) {
+      const container = document.getElementById('pet-previews-container');
+      container.innerHTML = '';
+      if (!input.files) return;
+      Array.from(input.files).slice(0, 5).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = e => {
+          const img = document.createElement('img');
+          img.src = e.target.result;
+          img.className = 'preview-thumb';
+          container.appendChild(img);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // User avatar preview
+    function handleUserAvatarPreview(input) {
+      const container = document.getElementById('user-avatar-preview');
+      const label = document.getElementById('user-avatar-label');
+      container.innerHTML = '';
+      if (input.files && input.files[0]) {
+        label.innerText = input.files[0].name;
+        const reader = new FileReader();
+        reader.onload = e => {
+          const img = document.createElement('img');
+          img.src = e.target.result;
+          img.className = 'preview-thumb';
+          img.style.borderRadius = '50%';
+          container.appendChild(img);
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+
+    // Submit Pet Form
+    async function submitPetForm(e) {
+      e.preventDefault();
+      const submitBtn = document.getElementById('pet-submit-btn');
+      submitBtn.disabled = true;
+      submitBtn.innerText = 'Guardando...';
+
+      const formData = new FormData();
+      formData.append('especie', document.getElementById('pet-species').value);
+      formData.append('sexo', document.getElementById('pet-sex').value);
+      formData.append('color', document.getElementById('pet-color').value);
+      formData.append('edad', document.getElementById('pet-age').value);
+
+      const files = document.getElementById('pet-images-input').files;
+      for (let i = 0; i < files.length; i++) {
+        formData.append('img', files[i]);
+      }
+
+      try {
+        const res = await fetch('/api/pets', { method: 'POST', body: formData });
+        const data = await res.json();
+
+        if (res.status === 201) {
+          showToast('Mascota registrada correctamente');
+          closeModal('modal-pet');
+          document.getElementById('form-pet').reset();
+          document.getElementById('pet-previews-container').innerHTML = '';
+          await loadAllData();
+        } else {
+          showToast(data.message || 'Error al guardar', true);
+        }
+      } catch (err) {
+        showToast('Error de red', true);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'Guardar Mascota';
+      }
+    }
+
+    // Submit User Form
+    async function submitUserForm(e) {
+      e.preventDefault();
+      const submitBtn = document.getElementById('user-submit-btn');
+      submitBtn.disabled = true;
+      submitBtn.innerText = 'Guardando...';
+
+      const formData = new FormData();
+      formData.append('firstname', document.getElementById('user-fname').value);
+      formData.append('lastname', document.getElementById('user-lname').value);
+      formData.append('username', document.getElementById('user-uname').value);
+      formData.append('password', document.getElementById('user-pass').value);
+
+      const avatarInput = document.getElementById('user-avatar-input');
+      if (avatarInput.files[0]) {
+        formData.append('avatar', avatarInput.files[0]);
+      }
+
+      try {
+        const res = await fetch('/api/users', { method: 'POST', body: formData });
+        const data = await res.json();
+
+        if (res.status === 201) {
+          showToast('Usuario creado correctamente');
+          closeModal('modal-user');
+          document.getElementById('form-user').reset();
+          document.getElementById('user-avatar-preview').innerHTML = '';
+          document.getElementById('user-avatar-label').innerText = 'Seleccionar imagen de perfil';
+          await loadAllData();
+        } else {
+          showToast(data.message || 'Error al guardar', true);
+        }
+      } catch (err) {
+        showToast('Error de red', true);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'Registrar Usuario';
+      }
+    }
+
+    // Delete Pet
+    async function deletePet(id) {
+      if (!confirm(`¿Eliminar la mascota #${id}? Esta acción no se puede deshacer.`)) return;
+      try {
+        const res = await fetch(`/api/pets/${id}`, { method: 'DELETE' });
+        if (res.status === 200) {
+          showToast(`Mascota #${id} eliminada`);
+          await loadAllData();
+        } else {
+          showToast('Error al eliminar recurso', true);
+        }
+      } catch (err) {
+        showToast('Error de red', true);
+      }
+    }
+
+    // Delete User
+    async function deleteUser(id) {
+      if (!confirm(`¿Eliminar el usuario #${id}? Esta acción no se puede deshacer.`)) return;
+      try {
+        const res = await fetch(`/api/users/${id}`, { method: 'DELETE' });
+        if (res.status === 200) {
+          showToast(`Usuario #${id} eliminado`);
+          await loadAllData();
+        } else {
+          showToast('Error al eliminar usuario', true);
+        }
+      } catch (err) {
+        showToast('Error de red', true);
+      }
+    }
+
+    // Toast notifications
+    function showToast(message, isError = false) {
+      const container = document.getElementById('toasts');
+      const toast = document.createElement('div');
+      toast.className = `toast ${isError ? 'toast-error' : 'toast-success'}`;
+      toast.innerHTML = `
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="${isError ? '#ef4444' : '#10b981'}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          ${isError ? '<circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line>' : '<path d="M20 6 9 17l-5-5"></path>'}
+        </svg>
+        <span>${message}</span>
+      `;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(8px)';
+        toast.style.transition = 'all 0.2s';
+        setTimeout(() => toast.remove(), 250);
+      }, 3000);
+    }
+
+    // Initialize
+    loadAllData();
+  </script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+[
+  {
+    "id": 1,
+    "especie": "perro",
+    "color": "negro con manchas blancas",
+    "edad": 4,
+    "sexo": "macho",
+    "img": [
+      "/img/pets/pet-1-1710000001.jpg",
+      "/img/pets/pet-2-1710000002.jpg"
+    ]
+  }
+]
